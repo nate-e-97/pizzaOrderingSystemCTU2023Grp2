@@ -74,7 +74,21 @@ paths:
                     {
                         ""
                     }
-
+  /cart:
+    get:
+      summary: View Cart
+      operationId: get_cart
+      responses:
+        '200':
+          description: Cart seen
+          content:
+            application/json:
+              examples:
+                Success:
+                  value: |-
+                    {
+                        "cart": "cart_data"
+                    }
 
 tags:
   - name: user
