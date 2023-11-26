@@ -85,7 +85,7 @@ const DB_DEF = [
         ('Admin'),
         ('CancelOrder'),
         ('ModifyOrder'),
-        ('EditMenu')
+        ('EditMenu');
     `),
     new DBModel('UserPermissionRelations', 
     `
@@ -93,6 +93,10 @@ const DB_DEF = [
         permissionName varchar(255),
         FOREIGN KEY(userId) REFERENCES Users(userId),
         FOREIGN KEY(permissionName) REFERENCES Permissions(permissionName)
+    `,
+    `
+        INSERT INTO UserPermissionRelations (userId, permissionName) VALUES
+        ('1', 'Admin');
     `),
     new DBModel('MenuPizzas', 
     `
