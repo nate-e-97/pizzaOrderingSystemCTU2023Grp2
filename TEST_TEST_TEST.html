@@ -1,11 +1,122 @@
 ﻿<!DOCTYPE html>
-
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placing an Order</title>
+    <style>
+        body {
+            
+            background-size: 100%;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        select {
+            width: 200px;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        #total {
+            font-weight: bold;
+        }
+
+        button {
+            background-color: red;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
+
+    <h1>Placing an Order</h1>
+
+    <form id="Placing_Orded">
+        <!-- Signature Pizzas -->
+        <label for="item1">Signature Pizzas:</label>
+        <select id="item1" onchange="calculateTotal()">
+            <option value="0">Select Item</option>
+            <option value="10">Specialty 1 - $10</option>
+            <option value="20">Specialty 2 - $20</option>
+            <option value="15">Specialty 3 - $15</option>
+        </select>
+
+        <label for="quantity1">Quantity:</label>
+        <input type="number" id="quantity1" min="1" value="1" oninput="calculateTotal()">
+
+        <!-- Salads -->
+        <label for="item2">Salads:</label>
+        <select id="item2" onchange="calculateTotal()">
+            <option value="0">Select Item</option>
+            <option value="10">Item A - $10</option>
+            <option value="20">Item B - $20</option>
+            <option value="15">Item C - $15</option>
+        </select>
+
+        <label for="quantity2">Quantity:</label>
+        <input type="number" id="quantity2" min="1" value="1" oninput="calculateTotal()">
+
+        <!-- Drinks: -->
+        <label for="item3">Drinks:</label>
+        <select id="item3" onchange="calculateTotal()">
+            <option value="0">Select Item</option>
+            <option value="10">Item A - $10</option>
+            <option value="20">Item B - $20</option>
+            <option value="15">Item C - $15</option>
+        </select>
+
+        <!-- Promo -->
+        <label for="item4">Promo:</label>
+        <select id="item4" onchange="calculateTotal()">
+            <option value="0">Select Item</option>
+            <option value="10">Special 1 - $10</option>
+            <option value="20">Special 2 - $20</option>
+            <option value="15">Special 3 - $15</option>
+        </select>
+
+        <label for="quantity3">Quantity:</label>
+        <input type="number" id="quantity3" min="1" value="1" oninput="calculateTotal()">
+
+        <label for="total">Total Price:</label>
+        <div id="total">$0</div>
+
+
+        <button type="button" onclick="Continue_to_Checkout()">Continue to Checkout</button>
+    </form>
+
+    <script>
+        function calculateTotal() {
+            const item1Price = document.getElementById('item1').options[document.getElementById('item1').selectedIndex].value;
+            const quantity1 = document.getElementById('quantity1').value;
+
+            const item2Price = document.getElementById('item2').options[document.getElementById('item2').selectedIndex].value;
+            const quantity2 = document.getElementById('quantity2').value;
+
+            const item3Price = document.getElementById('item3').options[document.getElementById('item3').selectedIndex].value;
+            const quantity3 = document.getElementById('quantity3').value;
+
+            const item4Price = document.getElementById('item4').options[document.getElementById('item4').selectedIndex].value;
+            const quantity4 = document.getElementById('quantity3').value;
+
+            const total = (item1Price * quantity1) + (item2Price * quantity2) + (item3Price * quantity3) + (item4Price * quantity4);
+
+            document.getElementById('total').textContent = '$' + total;
+        }
+
+        function Continue_to_Checkout() {
+            window.location.href = "https://www.google.com/";
+        
+        }
+    </script>
 
 </body>
 </html>
