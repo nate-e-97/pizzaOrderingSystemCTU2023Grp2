@@ -49,7 +49,7 @@ router.post('/', (req, res) => {
  */
 router.post(':userId/sessions', (req, res) => {
     if (res.locals.user == req.params.userId) {
-        let authData = req.headers.authorization.split(" ")[1]
+        let authData = req.headers.authorization
 
         let authCookie = req.cookies.loginToken
 
