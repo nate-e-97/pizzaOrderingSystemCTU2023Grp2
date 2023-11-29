@@ -41,7 +41,7 @@ app.use(express.json());
 app.use(express.static('./'))
 
 // Cookie Parser makes it easier to handle cookie operations
-app.use(require('cookie-parser'))
+app.use(require('cookie-parser')())
 
 // CORS allows requests from localhost to hit localhost.
 app.use(require('cors')())

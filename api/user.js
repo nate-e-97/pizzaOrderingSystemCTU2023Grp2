@@ -44,11 +44,10 @@ router.post('/', (req, res) => {
  * POST /api/users/{id}/sessions
  * @summary Endpoint for user login
  * @tags user
- * @param {string} id.path - User ID logging in
  * @return {UserLoginResponse} 204 - success response - application/json
  */
-router.post(':userId/sessions', (req, res) => {
-    if (res.locals.user == req.params.userId) {
+router.post('/sessions', (req, res) => {
+    if (res.locals.user) {
         let authData = req.headers.authorization
 
         let authCookie = req.cookies.loginToken
@@ -64,11 +63,10 @@ router.post(':userId/sessions', (req, res) => {
  * DELETE /api/users/{id}/sessions
  * @summary Endpoint for user logout
  * @tags user
- * @param {string} id.path - User ID logging out
  * @return {UserLoginResponse} 204 - success response - application/json
  */
-router.delete(':userId/sessions', (req, res) => {
-    if (res.locals.user == req.params.userId) {
+router.delete('/sessions', (req, res) => {
+    if (req.cookies.loginToken) {
         res.clearCookie('loginToken')
 
         res.status(204).send('Logged Out')
