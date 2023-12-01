@@ -40,6 +40,12 @@ app.use(express.json());
 // Serves up files that are linked statically (.css, .js files in our html)
 app.use(express.static('./'))
 
+// Cookie Parser makes it easier to handle cookie operations
+app.use(require('cookie-parser')())
+
+// CORS allows requests from localhost to hit localhost.
+app.use(require('cors')())
+
 // Authentication middleware
 app.use(require('./middleware/auth'))
 

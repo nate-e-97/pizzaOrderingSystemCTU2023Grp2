@@ -44,13 +44,35 @@ router.post('/', (req, res) => {
  * POST /api/users/{id}/sessions
  * @summary Endpoint for user login
  * @tags user
- * @param {string} id.path - User ID logging in
  * @return {UserLoginResponse} 204 - success response - application/json
  */
-router.post(':userId/sessions', (req, res) => {
+router.post('/sessions', (req, res) => {
+    if (res.locals.user) {
+        let authData = req.headers.authorization
 
+        let authCookie = req.cookies.loginToken
+
+        if (authCookie === undefined) res.cookie('loginToken', authData, {maxAge: 9999999, httpOnly: true})
+
+        res.status(204).send('Logged In')
+    }
+    else res.status(401).send('Not Authorized')
 })
 
+/**
+ * DELETE /api/users/{id}/sessions
+ * @summary Endpoint for user logout
+ * @tags user
+ * @return {UserLoginResponse} 204 - success response - application/json
+ */
+router.delete('/sessions', (req, res) => {
+    if (req.cookies.loginToken) {
+        res.clearCookie('loginToken')
+
+        res.status(204).send('Logged Out')
+    }
+    else res.status(401).send('Not Authorized')
+})
 
 
 module.exports = router

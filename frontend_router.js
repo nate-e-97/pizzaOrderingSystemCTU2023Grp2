@@ -8,7 +8,8 @@ const frontendRoutes = {
     "/": "index.html",
     "/about": "AboutUs.html",
     "/contact": "ContactUsPage.html",
-    "/promos": "DAILY_PIZZA_SPECIALS.html"
+    "/promos": "DAILY_PIZZA_SPECIALS.html",
+    "/login": "loginPage.html"
 }
 
 /**
