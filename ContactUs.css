@@ -7,7 +7,7 @@
 
 .contact{
     min-height: 100vh;
-    background-color: #e8f0fe;
+    background-color: #cb202d;
     padding: 50px;
     text-align: center;
 }
@@ -61,7 +61,7 @@ textarea:focus{
 button{
     display: inline-block;
     padding: 12px 24px;
-    background-color: #4caf50;
+    background-color: #333;
     color: #fff;
     border: none;
     cursor: pointer;
@@ -83,11 +83,11 @@ button:hover{
 
 .contact-info p {
     margin-bottom: 10px;
-    color: #555;
+    color: #333;
 }
 
 .contact-info i {
-    color: #4caf50;
+    color: #333
     margin-right: 10px;
 }
 
