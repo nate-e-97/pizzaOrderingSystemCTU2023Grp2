@@ -1,0 +1,267 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIZZA ORDERING PAGE</title>
+    <style>
+        body {
+            background-image: url('PIZZA_ORDER_PAGE_Background.jpg');
+            font-family: Arial;
+            margin: 10px;
+        }
+
+        header {
+            background-color: #191919;
+            font-size: 24px;
+            color: #ff0000;
+            text-align: center;
+            padding: .75em;
+        }
+
+        h1 {
+            background-color: #d4cac1;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .pizza-options {
+            display: flex;
+            justify-content: space-around;
+            padding: 3px;
+            margin: 3px;
+        }
+
+        .pizza-option {
+            background-color: #d4cac1;
+            text-align: center;
+            width: 15%;
+            border: 1px solid #ccc;
+            padding: 3px;
+            margin: 10px;
+        }
+
+        #order-summary {
+            text-align: center;
+            padding: 5px;
+        }
+
+        button {
+            padding: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+
+        .home_page {
+            align-self: flex-start;
+            margin-top: 5px;
+            background-color: #d14d4d;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .view_Cart {
+            align-self: flex-start;
+            margin-top: 5px;
+            background-color: #d14d4d;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        footer {
+            background-color: #191919;
+            color: white;
+            text-align: center;
+            padding: .75em;
+            position: fixed;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <header> PIZZA ORDERING PAGE </header>
+
+    <div class="pizza-options">
+
+        <div class="pizza-option" id="pizzaOption1">
+            <img src="Cheese_Pizza_1.jpg" width="190" height="140">
+            <h3>Cheese Pizza - $9.99</h3>
+            <h1>Garlic Crust, Tomato Sauce</h1>
+            <p>
+                <button onclick="addToCart('pizzaOption1')"style= "background-color: #d14d4d; color: white;" >Add to Cart</button>
+            </p>
+        </div>
+
+        <div class="pizza-option" id="pizzaOption2">
+            <img src="Peperoni_Pizza_2.jpg" width="190" height="140">
+            <h3>Pepperoni Pizza - $10.99</h3>
+            <h1>Garlic Crust, Tomato Sauce, Pepperoni</h1>
+            <p>
+                <button onclick="addToCart('pizzaOption2')"style= "background-color: #d14d4d; color: white;">Add to Cart</button>
+            </p>
+        </div>
+
+        <div class="pizza-option" id="pizzaOption3">
+            <img src="Meatlovers_Pizza_3.jpg" width="190" height="140">
+            <h3>Meat Lover''s Pizza - $11.99</h3>
+            <h1>Garlic Crust, Pepperoni, Sausage</h1>
+            <p>
+                <button onclick="addToCart('pizzaOption3')"style= "background-color: #d14d4d; color: white;">Add to Cart</button>
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="pizza-options">
+
+        <div class="pizza-option" id="pizzaOption4">
+            <img src="Small_Pizza_4.jpg" width="190" height="140">
+            <h3>Small Custom Pizza - $9.99</h3>
+            <form>
+                <label for="SelectOptions">Select Your Options:</label>
+                <ul class="ingredientList"></ul>
+            </form>
+            <p>
+                <button onclick="addToCart('pizzaOption4')"style= "background-color: #d14d4d; color: white;">Add to Cart</button>
+            </p>
+        </div>
+
+        <div class="pizza-option" id="pizzaOption5">
+            <img src="Medium_Pizza_5.jpg" width="190" height="140">
+            <h3>Medium Custom Pizza - $11.99</h3>
+            <form>
+                <label for="SelectOptions">Select Your Options:</label>
+                <ul class="ingredientList"></ul>
+            </form>
+            <p>
+                <button onclick="addToCart('pizzaOption5')"style= "background-color: #d14d4d; color: white;">Add to Cart</button>
+            </p>
+        </div>
+
+        <div class="pizza-option" id="pizzaOption6">
+            <img src="Large_Pizza_6.jpg" width="190" height="140">
+            <h3>Large Custom Pizza - $12.99</h3>
+            <form>
+                <label for="SelectOptions">Select Your Options:</label>
+                <ul class="ingredientList"></ul>
+            </form>
+            <p>
+                <button onclick="addToCart('pizzaOption6')"style= "background-color: #d14d4d; color: white;">Add to Cart</button>
+            </p>
+        </div>
+
+    </div>
+
+    <footer>
+        <button class="home_page">Home Page</button> &nbsp; &nbsp; &nbsp; &nbsp;
+        <button class="view_Cart">View Cart</button>
+    </footer>
+
+    <script>
+        let testData = [
+            {
+                "ingredientName": "Pepperoni",
+                "extraCost": 50,
+                "ingredientType": "TOPPING"
+            },
+            {
+                "ingredientName": "Sausage",
+                "extraCost": 80,
+                "ingredientType": "TOPPING"
+            },
+            {
+                "ingredientName": "Peppers",
+                "extraCost": 75,
+                "ingredientType": "TOPPING"
+            },
+            {
+                "ingredientName": "Pineapple",
+                "extraCost": 100,
+                "ingredientType": "TOPPING"
+            },
+            {
+                "ingredientName": "Tomato Sauce",
+                "extraCost": 50,
+                "ingredientType": "SAUCE"
+            },
+            {
+                "ingredientName": "BBQ Sauce",
+                "extraCost": 100,
+                "ingredientType": "SAUCE"
+            },
+            {
+                "ingredientName": "Garlic Crust",
+                "extraCost": 150,
+                "ingredientType": "CRUST"
+            },
+            {
+                "ingredientName": "Thin Crust",
+                "extraCost": 175,
+                "ingredientType": "CRUST"
+            }
+        ];
+
+        function updateIngredientsList(optionId) {
+            var ingredientList = document.getElementById(optionId).getElementsByClassName("ingredientList")[0];
+            ingredientList.innerHTML = '';
+
+            testData.forEach(ingredient => {
+                ingredientList.innerHTML += `
+                            <li>
+                                <input type="checkbox" name="${optionId}_option[]" value="${ingredient.ingredientName}" id="${optionId}_${ingredient.ingredientName}">
+                                <label for="${optionId}_${ingredient.ingredientName}">${ingredient.ingredientName} - $${(ingredient.extraCost / 100).toFixed(2)}</label>
+                            </li>
+                        `;
+            });
+        }
+
+        function addToCart(optionId) {
+            var selectedOptions = document.querySelectorAll(`input[name="${optionId}_option[]"]:checked`);
+            var selectedOptionNames = Array.from(selectedOptions).map(option => option.value);
+
+            var cartItemsList = document.getElementById("cartItems");
+            selectedOptionNames.forEach(optionName => {
+                var cartItem = document.createElement('li');
+                cartItem.textContent = optionName;
+                cartItemsList.appendChild(cartItem);
+            });
+
+        }
+
+        // Initial update of ingredients list after the DOM is loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            updateIngredientsList('pizzaOption4');
+            updateIngredientsList('pizzaOption5');
+            updateIngredientsList('pizzaOption6');
+        });
+
+        const View_Cart_Button = document.getElementsByClassName('view_Cart')[0];
+
+        View_Cart_Button.addEventListener('click', function () {
+            window.location.href = "https://www.bing.com/";
+            // Replace with Cart Website
+        });
+
+        const View_Home_Page = document.getElementsByClassName('home_page')[0];
+
+        View_Home_Page.addEventListener('click', function () {
+            window.location.href = "https://www.google.com/";;
+            // Replace with Website Home Page
+        });
+
+    </script>
+
+</body>
+
+</html>
