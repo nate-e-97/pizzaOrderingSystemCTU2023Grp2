@@ -1,0 +1,32 @@
+* {
+    background-color: #cb202d;
+    margin: 0px;
+    padding: 0px;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 250px;
+    margin-bottom: 50px;
+}
+
+h3 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+p {
+    text-align: center;
+    font-size: large;
+}
+
+button {
+border-radius: 15px;
+border-color: black;
+background-color: black;
+color: #ffffff;
+margin: 150px 150px 300px 300px;
+padding: 10px 10px 10px 10px;
+}
+
+    
