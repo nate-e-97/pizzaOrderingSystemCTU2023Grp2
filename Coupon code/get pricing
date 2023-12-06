@@ -1,0 +1,47 @@
+def get_price(item):
+    prices = {'SIGNATURE PIZZA': 19.99, 'SPECIALTY PIZZA': 15.99, 'SINGLE SLICE': 9.99}
+	    return prices.get(item, 0)
+
+
+def apply_discount(total_price, coupon):
+    
+    discounts = {'PRMONTH': 0.1, 'PRG21': 0.2}
+	  discount = discounts.get(coupon, 0)
+	  discounted_price = total_price - (total_price * discount)
+	  logging.info(f"Discount: {discount * 100}%")
+	  return discounted_price
+
+if __name__ == "__main__":
+	    items = {}
+	    proceed_shopping = 'Y'
+	    while proceed_shopping == 'Y':
+	        start_shopping = input("Do you want to start shopping? (Y/N): ")
+	        if start_shopping.upper() == 'Y':
+	            coupon = input("Do you have a discount coupon? (SAVE10/SAVE20/NO): ")
+	            while True:
+	                item = input("Select your item (PIZZA/SINGLE SLICE): ")
+	                quantity = int(input("Enter the quantity: "))
+	                items[item] = items.get(item, 0) + quantity
+	                proceed_shopping = input("Do you want to proceed shopping? (Y/N): ")
+	                if proceed_shopping.upper() != 'Y':
+	                    break
+	        else:
+	            break
+	 
+	    total_price = calculate_total_price(items)
+	    if total_price > 0:
+	        print("Total Price:")
+	        for item, quantity in items.items():
+	            price = get_price(item)
+	            subtotal = price * quantity
+	            print(f"{item} quantity: {quantity} Total Price: {subtotal}")
+	        coupon = coupon.upper()
+	        if coupon != 'NO':
+	            total_price = apply_discount(total_price, coupon)
+	            print(f"TOTAL: RM {total_price}")
+	            print(f"DISCOUNT: RM {total_price * discounts.get(coupon, 0)}")
+	            print(f"TOTAL AMOUNT TO BE PAID: RM {total_price}")
+	        else:
+	            print(f"TOTAL: RM {total_price}")
+	    else:
+	        print("No items in the shopping cart.")
