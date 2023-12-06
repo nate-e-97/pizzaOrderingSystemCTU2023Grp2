@@ -1,37 +1,109 @@
 <!DOCTYPE html>
-<html lang="en" dir="'ltr">
-    <head>
-        <meta charset="utf-8">
-        <title> Login Form </title>
-        <link rel="stylesheet" href="loginpagestyle.css">
-    </head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Restaurant Login</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        body {
+            background-image: url('https://th.bing.com/th/id/R.2827c4985e16a9fd9d7bee9e1942ac73?rik=LhQbJmeUOdDe%2bw&riu=http%3a%2f%2fcdn.shopify.com%2fs%2ffiles%2f1%2f2537%2f8806%2fproducts%2fCustom-3D-Mural-Wallpaper-Wall-Painting-Personalized-Pizza-Shop-Blackboard-Photo-Wall-Paper-Cafe-Restaurant-Backdrop_3774917f-27cb-44a1-90ea-86eddfab0be4_1200x1200.jpg%3fv%3d1583769301&ehk=sSSAKf0S0OsFqtgzHreQ0jHiV0M4bJjdm7QGDm05lds%3d&risl=&pid=ImgRaw&r=0'); /* Replace with your image URL */
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
 
-    <body>
-        <div class="center">
-            <h1>Login</h1>
-            <form method="post">
-                <div class="txt_field">
-                    <input type="text" required>
-                    <span></span>
-                    <label>Username</label>
-                </div>
+        #formContainer {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
 
-                <div class="txt_field">
-                    <input type="password" required>
-                    <span></span>
-                    <label>Password</label>
-                </div>
+        h2, label, input, button {
+            display: inline-block;
+            margin: 0;
+        }
 
-                <div class="pass">
-                    Forgot Password?
-                </div>
+        label {
+            width: 100px; /* Adjust as needed */
+        }
 
-                <input type="submit" value="Login"> 
-                
-                <div class="signup_link">
-                    Not a member? <a href="#">Sign Up</a>
-                </div>
-            </form>
-        </div>
-    </body>
+        #logoutBtn {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="formContainer">
+        <form id="loginForm">
+            <h2>Customer Login</h2>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="button" id="loginBtn" onclick="login()">Login</button>
+            <button type="button" id="logoutBtn" onclick="logout()">Logout</button>
+        </form>
+    </div>
+
+    <script>
+        function login() {
+            // You can add authentication logic here (for example, check if email and password are valid)
+            var email = $('#email').val();
+            var password = $('#password').val();
+
+            // HTTP authorization: Basic  atob(username:password)
+
+            $.ajax({
+                url: "/api/users/sessions",
+                type: "POST",
+                headers: {
+                    'authorization': `Basic ${btoa(email+":"+password)}`
+                },
+                success: function(res) {
+                    alert('Login successful!');
+                    $("#loginBtn").hide()
+                    $("#logoutBtn").show()
+                },
+                error: function(err) {
+                    alert('Login failed. Please check your email and password.');
+                }
+            })
+        }
+
+        function getLoginCookie() {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; loginToken=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        function logout() {
+            console.log(getLoginCookie())
+            $.ajax({
+                url: "/api/users/sessions",
+                type: "DELETE",
+                success: function(res) {
+                    alert('Logout successful!');
+                    $("#loginBtn").show()
+                    $("#logoutBtn").hide()
+                },
+                error: function(err) {
+                    alert('Logout failed.');
+                }
+            })
+        }
+    </script>
+
+</body>
 </html>
