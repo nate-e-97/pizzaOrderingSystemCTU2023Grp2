@@ -15,6 +15,8 @@ const jsDocOptions = {
       },
     },
     swaggerUIPath: '/api/docs',
+    exposeApiDocs: true,
+    apiDocsPath: '/api/docs/json',
     security: {
       BasicAuth: {
         type: 'http',
@@ -39,6 +41,9 @@ app.use(express.json());
 
 // Serves up files that are linked statically (.css, .js files in our html)
 app.use(express.static('./'))
+app.use('/js', express.static('./js'))
+app.use('/css', express.static('./css'))
+app.use('/img', express.static('./img'))
 
 // Cookie Parser makes it easier to handle cookie operations
 app.use(require('cookie-parser')())

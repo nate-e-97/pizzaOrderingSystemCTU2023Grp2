@@ -4,9 +4,9 @@ const db = require('../db')
 /**
  * User
  * @typedef {object} User
- * @property {string} id.required - User Id
+ * @property {string} id - User Id
  * @property {string} username.required - User's Username
- * @property {string} password - User's Password
+ * @property {string} password.required - User's Password
  * @property {string} firstName - User's first name
  * @property {string} lastName - User's last name
  */
@@ -24,21 +24,41 @@ const db = require('../db')
  * @return {array<User>} 200 - success response - application/json
  */
 router.get('/', (req, res) => {
-    let getAllQuery = db.prepare('SELECT userId as id, username, firstName, lastName FROM Users')
+    let getAllQuery = db.prepare('SELECT userId as id, username, firstName, lastName, phoneNumber FROM Users')
     res.send(getAllQuery.all())
 })
-
 
 /**
  * POST /api/users
  * @summary Endpoint to create a user
+ * @param {User} request.body.required - New user details
  * @tags user
- * @return {array<User>} 200 - success response - application/json
+ * @return {User} 201 - success response - application/json
  */
 router.post('/', (req, res) => {
-    
-})
+    let requiredFields = ["username", "password", "firstName", "lastName"]
 
+    if (requiredFields.every( element => Object.keys(req.body).includes(element) )) {
+        let insertUserQuery = db.prepare(`INSERT INTO Users (username, password, firstName, lastName, phoneNumber) VALUES (@username, @password, @firstName, @lastName, @phoneNumber)`)
+
+        let transaction = db.transaction((user) => {
+            if (! user.hasOwnProperty('phoneNumber')) user.phoneNumber = null
+            insertUserQuery.run(user)
+        })
+
+        try {
+            transaction(req.body)
+
+            res.status(201).send(db.prepare(`SELECT username, firstName, lastName FROM Users WHERE username = @username`).get(req.body))
+        }
+        catch {
+            res.status(500).send("Something went wrong")
+        }
+    }
+    else {
+        res.status(400).send("Missing required field(s)")
+    }
+})
 
 /**
  * POST /api/users/{id}/sessions

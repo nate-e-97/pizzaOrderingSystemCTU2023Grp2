@@ -20,7 +20,7 @@ const path = require('path')
 
 Object.keys(frontendRoutes).forEach(route => {
     router.get(route, (req, res) => {
-        res.sendFile(path.join(__dirname, frontendRoutes[route]))
+        res.sendFile(path.join(__dirname, 'html', frontendRoutes[route]))
     })
 })
 
