@@ -1,6 +1,8 @@
+require('dotenv').config();
+
 const express = require('express');
 const expressJSDocSwagger = require('express-jsdoc-swagger');
-
+const nodemailer = require('nodemailer');
 const PORT = 43500
 
 /**
@@ -59,6 +61,36 @@ app.use('/api', require('./api'))
 
 // Frontend Router
 app.use('/', require('./frontend_router'))
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+      user: process.env.EMAIL,
+      pass: process.env.PASSWORD
+  }
+});
+
+app.post('/submit-feedback', (req, res) => {
+  const { email, subject, description } = req.body;
+
+  const mailOptions = {
+      from: process.env.EMAIL, // Your server's email
+      replyTo: email, // Customer's email address
+      to: 'customerfeedbackPRGroup2@gmail.com', // Your support email
+      subject: subject,
+      text: `Message from ${email}: \n\n${description}`
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+          console.error("Error sending email: ", error);
+          res.status(500).send('Error sending feedback: ' + error.message);
+      } else {
+          console.log('Email sent: ' + info.response);
+          res.send('Feedback sent successfully');
+      }
+  });
+});
 
 // Initializes the database
 require('./db')
