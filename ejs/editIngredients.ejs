@@ -1,0 +1,42 @@
+<section>
+    <ul class="list-group" id="ingredientMenuList">
+        
+    </ul>
+    <button class="btn btn-primary" onclick="ingredientData.push({extraCost: 0, ingredientName: '', ingredientType: 'TOPPING'});drawMenu()">Add Ingredient</button>
+    <button class="btn btn-primary" onclick="saveMenu()">Submit Changes</button>
+</section>
+
+<script>
+    let ingredientData
+
+    window.addEventListener("load", async (event) => {
+        ingredientData = await getDataFromServer('/api/pizzas/ingredients')
+
+        drawMenu()
+    })
+
+    function drawMenu() {
+
+        document.getElementById('ingredientMenuList').innerHTML = ''
+
+        ingredientData.forEach((menuItem, i) => {
+            document.getElementById('ingredientMenuList').innerHTML += `
+                <li class="list-group-item">
+                    <input oninput="ingredientData[${i}].extraCost=this.value" type="number" class="form-control" aria-label="Ingredient Extra Cost" value="${menuItem.extraCost}">
+                    <input oninput="ingredientData[${i}].ingredientName=this.value" type="text" class="form-control" aria-label="Ingredient Name" value="${menuItem.ingredientName}">
+                    <select class="form-select" onchange="ingredientData[${i}].ingredientType=this.value">
+                        <option ${menuItem.ingredientType == "SAUCE" ? "selected" : ""} value="SAUCE">SAUCE</option>
+                        <option ${menuItem.ingredientType == "TOPPING" ? "selected" : ""} value="TOPPING">TOPPING</option>
+                        <option ${menuItem.ingredientType == "CRUST" ? "selected" : ""} value="CRUST">CRUST</option>
+                    </select>
+                </li>
+            `
+        })
+    }
+
+    async function saveMenu() {
+        await sendDataToServer('/api/pizzas/ingredients', ingredientData)
+
+        location.reload()
+    }
+</script>

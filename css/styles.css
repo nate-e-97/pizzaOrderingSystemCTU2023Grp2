@@ -29,7 +29,7 @@ header{
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	background: transparent;
+	background-color: var(--bg-color);
 	padding: 23px 15%;
 	transition: all .38s ease;
 }
@@ -122,6 +122,13 @@ header.sticky{
 	padding: 10px 15%;
 	background: var(--bg-color);
 	box-shadow: 0px 4px 15px rgb(0 0 0 / 8%);
+}
+footer {
+	color: white;
+	text-align: center;
+	padding: 1em;
+	bottom: 0;
+	width: 100%;
 }
 .container{
 	margin-top: 50px;
@@ -239,7 +246,7 @@ header.sticky{
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(150px, auto));
 	justify-content: center;
-	gap: 2rem;
+	/* gap: 2rem; */
 }
 .contact-content h4{
 	font-size: 20px;
@@ -278,6 +285,17 @@ header.sticky{
 	color: #fff;
 	background: var(--main-color);
 	border-radius: 5rem;
+}
+
+#loginPage {
+	min-width: 100vw;
+	margin: auto;
+	text-align: center;
+}
+
+#pageFrame {
+	align-content: center;
+	padding-top: 6vh;
 }
 
 @media (max-width: 1690px) {

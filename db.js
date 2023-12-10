@@ -35,13 +35,15 @@ const DB_DEF = [
         firstName varchar(255),
         lastName varchar(255),
         phoneNumber varchar(11),
-        activeCart varchar(255),
+        activeCart INTEGER,
+        preferredAddress INTEGER,
+        preferredCard INTEGER,
         FOREIGN KEY (activeCart) REFERENCES Carts(cartId)
     `,
     `
-        INSERT INTO Users (userId, username, password, firstName, lastName, phoneNumber, activeCart) VALUES
-        (1, 'admin', 'password', 'Admin', 'User', '1234567890', NULL),
-        (2, 'test', 'password', 'Test', 'Customer', '1234567890', NULL)
+        INSERT INTO Users (userId, username, password, firstName, lastName, phoneNumber, activeCart, preferredAddress, preferredCard) VALUES
+        (1, 'admin', 'password', 'Admin', 'User', '1234567890', NULL, NULL, NULL),
+        (2, 'test', 'password', 'Test', 'Customer', '1234567890', NULL, NULL, NULL)
     `),
     new DBModel('Addresses', 
     `
@@ -67,7 +69,8 @@ const DB_DEF = [
     `,
     `
         INSERT INTO UserAddressRelations (userId, addressId) VALUES
-        (2, 1)
+        (2, 1),
+        (2, 3)
     `),
     new DBModel('PaymentMethods', 
     `
@@ -168,15 +171,16 @@ const DB_DEF = [
         ('Pineapple Pizza', 'BBQ Sauce'),
         ('Supreme Pizza', 'Garlic Crust'),
         ('Supreme Pizza', 'Tomato Sauce'),
-        ('Supreme Pizza', 'Garlic Crust'),
         ('Supreme Pizza', 'Pepperoni'),
         ('Supreme Pizza', 'Sausage'),
         ('Supreme Pizza', 'Peppers')
     `),
     new DBModel('CustomPizzas', 
     `
-        pizzaId INTEGER UNIQUE PRIMARY KEY,
-        size varchar(255)
+        pizzaId INTEGER UNIQUE PRIMARY KEY
+    `,
+    `
+        INSERT INTO CustomPizzas (pizzaId) VALUES (0)
     `),
     new DBModel('CustomPizzaIngredientRelations', 
     `
@@ -191,23 +195,33 @@ const DB_DEF = [
     `),
     new DBModel('CartDynamicItemRelations', 
     `
+        cartItemRelId INTEGER UNIQUE PRIMARY KEY,
         itemType varchar(255),
         itemReference varchar(255),
+        count INTEGER,
+        price INTEGER,
+        size varchar(3),
         cartId varchar(255),
         FOREIGN KEY(cartId) REFERENCES Carts(cartId)
+    `,
+    `
+        INSERT INTO CartDynamicItemRelations (cartItemRelId) VALUES (0)
     `),
     new DBModel('Orders', 
     `
-        userId varchar(255),
-        paymentMethod varchar(255),
-        shippingAddress varchar(255),
-        cartId varchar(255),
-        orderId varchar(255) UNIQUE PRIMARY KEY,
-        promoId INTEGER,
+        userId INTEGER,
+        paymentMethod INTEGER,
+        shippingAddress INTEGER,
+        cartId INTEGER,
+        orderId INTEGER UNIQUE PRIMARY KEY,
+        -- promoId INTEGER,
         FOREIGN KEY (userId) REFERENCES Users(userId),
         FOREIGN KEY (paymentMethod) REFERENCES PaymentMethods(cardId),
-        FOREIGN KEY (cartId) REFERENCES Carts(cartId),
-        FOREIGN KEY (orderId) REFERENCES Promotions(promoId)
+        FOREIGN KEY (cartId) REFERENCES Carts(cartId)
+        -- FOREIGN KEY (promoId) REFERENCES Promotions(promoId)
+    `,
+    `
+        INSERT INTO Orders (orderId) VALUES (0)
     `),
     new DBModel('Promotions', 
     `
@@ -215,7 +229,14 @@ const DB_DEF = [
         startDate date,
         endDate date,
         description varchar(255),
+        price INTEGER,
         promoCode varchar(255)
+    `,
+    `
+        INSERT INTO Promotions (promoId, startDate, endDate, description, price, promoCode) VALUES
+        (1, '1/1/2023', '1/1/2024', '1 Slice of Pizza, 1 Topping, & 1 Large Soda', 599, 'SPECIAL1'),
+        (2, '1/1/2023', '1/1/2024', '2 Slices of Pizza, 1 Topping, & 1 Large Soda', 899, 'SPECIAL2'),
+        (3, '1/1/2023', '1/1/2024', '2 Medium, 2 Topping Pizzas', 2299, 'SPECIAL3')
     `),
 ]
 

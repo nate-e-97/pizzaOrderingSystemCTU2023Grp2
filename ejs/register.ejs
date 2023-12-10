@@ -1,0 +1,60 @@
+<section>
+    <h5>
+        Create an Account
+    </h5>
+    <div class="row">
+        <div class="col">
+            <label for="username">Username:</label>
+            <input class="form-control" id="username" type="text">
+        </div>
+        <div class="col">
+            <label for="password">Password:</label>
+            <input class="form-control" id="password" type="text">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <label for="firstName">First Name:</label>
+            <input class="form-control" id="firstName" type="text">
+        </div>
+        <div class="col">
+            <label for="lastName">Last Name:</label>
+            <input class="form-control" id="lastName" type="text">
+        </div>
+        <div class="col">
+            <label for="phoneNumber">Phone Number:</label>
+            <input class="form-control" id="phoneNumber" type="text">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-primary" onclick="submitRegistration()">Submit</button>
+        </div>
+    </div>
+</section>
+
+<script>
+    async function submitRegistration() {
+        await sendDataToServer('/api/users', {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+            firstName: document.getElementById('firstName').value,
+            lastName: document.getElementById('lastName').value,
+            phoneNumber: document.getElementById('phoneNumber').value
+        })
+
+        $.ajax({
+            url: "/api/users/sessions",
+            type: "POST",
+            headers: {
+                'authorization': `Basic ${btoa(document.getElementById('username').value+":"+document.getElementById('password').value)}`
+            },
+            success: function(res) {
+                location.reload()
+            },
+            error: function(err) {
+                alert('Login failed. Please check your username and password.');
+            }
+        })
+    }
+</script>

@@ -32,6 +32,9 @@ const jsDocOptions = {
 // Create express app
 const app = express();
 
+app.set('view engine', 'ejs');
+app.set('views', './ejs')
+
 // Initializes swagger documentation
 expressJSDocSwagger(app)(jsDocOptions);
 

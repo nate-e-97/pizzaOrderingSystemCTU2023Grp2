@@ -1,0 +1,67 @@
+<section>
+    <ul class="list-group" id="pizzaMenuList">
+        
+    </ul>
+    <button class="btn btn-primary" onclick="menuData.push({name: '', ingredients: [], price: 0});drawMenu()">Add Pizza</button>
+    <button class="btn btn-primary" onclick="saveMenu()">Submit Changes</button>
+</section>
+
+<script>
+    let menuData
+    let ingredientsList
+
+    window.addEventListener("load", async (event) => {
+        menuData = await getDataFromServer('/api/pizzas')
+        ingredientsList = await getDataFromServer('/api/pizzas/ingredients')
+
+        drawMenu()
+    })
+
+    function getSelectValues(select) {
+        let result = [];
+        let options = select && select.options;
+        let opt;
+
+        for (let i=0, iLen=options.length; i<iLen; i++) {
+            opt = options[i];
+
+            if (opt.selected) {
+                result.push(opt.value || opt.text);
+            }
+        }
+        return result;
+    }
+
+    function drawMenu() {
+
+        document.getElementById('pizzaMenuList').innerHTML = ''
+
+        menuData.forEach((menuItem, i) => {
+
+        let ingredientsHtmlList = ''
+
+        ingredientsList.forEach(element => {
+            ingredientsHtmlList += `
+                <option ${menuItem.ingredients.includes(element.ingredientName) ? "selected" : ""} value="${element.ingredientName}">${element.ingredientName}</option>
+            `
+        })
+
+        document.getElementById('pizzaMenuList').innerHTML += `
+            <li class="list-group-item">
+                <input oninput="menuData[${i}].name=this.value" type="text" class="form-control" aria-label="Menu Item Name" value="${menuItem.name}">
+                <select onchange="menuData[${i}].ingredients=getSelectValues(this)" class="form-select" id="${menuItem.name}_Toppings" multiple>
+                    ${ingredientsHtmlList}
+                </select>
+                <input oninput="menuData[${i}].price=this.value" type="number" class="form-control" aria-label="Menu Item Price" value="${menuItem.price}">
+                <button class="btn btn-warning" onclick="menuData.splice(${i}, 1); drawMenu()">Delete</button>
+            </li>
+        `
+        })
+    }
+
+    async function saveMenu() {
+        await sendDataToServer('/api/pizzas', menuData)
+
+        location.reload()
+    }
+</script>

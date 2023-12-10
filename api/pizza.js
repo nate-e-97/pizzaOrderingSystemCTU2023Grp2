@@ -70,6 +70,73 @@ router.get('/', (req, res) => {
     res.send(pizzasList)
 })
 
+router.post('/', (req, res) => {
+    if (! res.locals.isAdmin) res.status(403).send('Forbidden')
+
+    db.prepare('DELETE FROM MenuPizzaIngredientRelations').run()
+    db.prepare('DELETE FROM MenuPizzas').run()
+
+    let pizzasList = []
+    let relList = []
+
+    req.body.forEach( pizzaMenuItem => {
+        pizzasList.push({
+            pizzaName: pizzaMenuItem.name,
+            price: pizzaMenuItem.price,
+        })
+        pizzaMenuItem.ingredients.forEach( ingredient => {
+            relList.push({
+                pizzaName: pizzaMenuItem.name,
+                ingredientName: ingredient
+            })
+        })
+    })
+
+    let insertPizzasQuery = db.prepare(`
+        INSERT INTO MenuPizzas (pizzaName, price) VALUES (@pizzaName, @price);
+    `)
+
+    let insertRelQuery = db.prepare(`
+        INSERT INTO MenuPizzaIngredientRelations (pizzaName, ingredientName) VALUES (@pizzaName, @ingredientName);
+    `)
+
+    pizzasList.forEach( menuPiece => {
+        insertPizzasQuery.run(menuPiece)
+    })
+
+    relList.forEach( relPiece => {
+        insertRelQuery.run(relPiece)
+    })
+
+    res.status(204).send('No Content')
+})
+
+router.post('/ingredients', (req, res) => {
+    if (! res.locals.isAdmin) res.status(403).send('Forbidden')
+
+    let insertIngredientQuery = db.prepare(`
+        INSERT INTO Ingredients (ingredientName, extraCost, ingredientType) VALUES (@ingredientName, @extraCost, @ingredientType)
+    `)
+
+    let updateIngredientQuery = db.prepare(`
+        UPDATE Ingredients SET 
+            extraCost=@extraCost, 
+            ingredientType=@ingredientType
+        WHERE ingredientName=@ingredientName
+    `)
+
+    req.body.forEach( ingredient => {
+        if (db.prepare(`SELECT ingredientName FROM Ingredients WHERE ingredientName=@ingredientName`).get({ingredientName: ingredient.ingredientName})) {
+            updateIngredientQuery.run(ingredient)
+        }
+        else {
+            insertIngredientQuery.run(ingredient)
+        }
+    })
+
+    res.status(204).send('No Content')
+})
+
 /**
  * GET /api/pizzas/ingredients
  * @summary Endpoint to retrieve all pingredients

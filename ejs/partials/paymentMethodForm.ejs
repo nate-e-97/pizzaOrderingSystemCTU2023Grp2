@@ -1,0 +1,165 @@
+<div class="row">
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="cardNumber" aria-label="Card Number" id="cardNumber">
+    </div>
+</div>
+<div class="row">
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Card Expiration Date (MM/YYYY)" aria-label="Expiration Date" id="cardExpDate">
+        <input type="text" class="form-control" placeholder="Card CVV" aria-label="CVV" id="cardCvv">
+    </div>
+</div>
+<div class="row">
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Card Holder Name" aria-label="Card Holder Name" id="cardCardholderName">
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="billingAddressUsePrimary" checked onchange="document.getElementById('billingAddressContainer').style.display = this.checked ? 'none' : 'block'">
+            <label class="form-check-label" for="billingAddressUsePrimary">
+                Use Primary Address for Billing?
+            </label>
+        </div>
+    </div>
+</div>
+<span id="billingAddressContainer" style="display: none;">
+    <div class="row">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Address Line 1" aria-label="Address Line 1" id="billingAddressLine1">
+            <input type="text" class="form-control" placeholder="Address Line 2" aria-label="Address Line 2" id="billingAddressLine2">
+        </div>
+    </div>
+    <div class="row">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="City" aria-label="City" id="billingCity">
+            <input type="text" class="form-control" placeholder="State Code (i.e. CO, CA)" aria-label="State" id="billingStateCode">
+            <input type="text" class="form-control" placeholder="zip code" aria-label="Zip Code" id="billingZipCode">
+        </div>
+    </div>
+</span>
+
+<div class="row">
+    <button class="btn btn-primary" id="paymentMethodCardSubmit">Submit</button>
+</div>
+
+<script>
+    let paymentMethodFormId = null
+
+    let paymentMethodFormModes = {
+        edit: 1,
+        create: 0
+    }
+
+    let paymentMethodFormMode = paymentMethodFormModes.create
+
+    let paymentMethodFormFieldsList = ['cardNumber', 'cardExpDate', 'cardCvv', 'cardCardholderName']
+
+    document.getElementById('paymentMethodCardSubmit').addEventListener('click', async e => {
+        e.preventDefault()
+
+        if (paymentMethodFormMode === 0) {
+            await createPaymentMethod()
+        }
+        else if (paymentMethodFormMode === 1) {
+            await updatePaymentMethod(paymentMethodFormId)
+        }
+    })
+
+    function resetPaymentMethodForm() {
+        paymentMethodFormFieldsList.forEach(elementId => {
+            document.getElementById(elementId).value = ''
+        })
+
+        let billingAddressFieldsMap = {
+            "billingAddressLine1": "addressLine1",
+            "billingAddressLine2": "addressLine2",
+            "billingCity": "city",
+            "billingStateCode": "stateCode",
+            "billingZipCode": "zipCode"
+        }
+
+        Object.keys(billingAddressFieldsMap).forEach(addressField => {
+            document.getElementById(addressField).value = ''
+        })
+    }
+
+    async function populatePaymentMethodForm() {
+        let paymentMethodData = await getDataFromServer(`/api/users/paymentMethods/${paymentMethodFormId}`)
+        paymentMethodFormFieldsList.forEach( paymentMethodField => {
+            document.getElementById(paymentMethodField).value = paymentMethodData[paymentMethodField]
+        })
+
+        let billingAddressFieldsMap = {
+            "billingAddressLine1": "addressLine1",
+            "billingAddressLine2": "addressLine2",
+            "billingCity": "city",
+            "billingStateCode": "stateCode",
+            "billingZipCode": "zipCode"
+        }
+
+        Object.keys(billingAddressFieldsMap).forEach(addressField => {
+            document.getElementById(addressField).value = paymentMethodData[billingAddressFieldsMap[addressField]]
+        })
+    }
+
+    async function updatePaymentMethod(paymentMethodId) {
+        let paymentMethodUpdateData = {}
+
+        paymentMethodFormFieldsList.forEach( paymentMethodField => {
+            paymentMethodUpdateData[paymentMethodField] = document.getElementById(paymentMethodField).value
+        })
+
+        let usePrimaryBillingAddress = document.getElementById('billingAddressUsePrimary').checked
+
+        if (usePrimaryBillingAddress) {
+            paymentMethodUpdateData.billingAddress = {
+                addressId: getCookie('activeAddress')
+            }
+        }
+        else {
+            paymentMethodUpdateData.billingAddress = {
+                addressLine1: document.getElementById('billingAddressLine1').value,
+                addressLine2: document.getElementById('billingAddressLine2').value,
+                city: document.getElementById('billingCity').value,
+                stateCode: document.getElementById('billingStateCode').value,
+                zipCode: document.getElementById('billingZipCode').value,
+            }
+        }
+
+        let update = await sendDataToServer(`/api/users/paymentMethods/${paymentMethodId}`, paymentMethodUpdateData, 'PUT')
+
+        location.reload()
+    }
+
+    async function createPaymentMethod() {
+        let paymentMethodData = {}
+
+        paymentMethodFormFieldsList.forEach( paymentMethodField => {
+            paymentMethodData[paymentMethodField] = document.getElementById(paymentMethodField).value
+        })
+        
+        let usePrimaryBillingAddress = document.getElementById('billingAddressUsePrimary').checked
+
+        if (usePrimaryBillingAddress) {
+            paymentMethodData.billingAddress = {
+                addressId: getCookie('activeAddress')
+            }
+        }
+        else {
+            paymentMethodData.billingAddress = {
+                addressLine1: document.getElementById('billingAddressLine1').value,
+                addressLine2: document.getElementById('billingAddressLine2').value,
+                city: document.getElementById('billingCity').value,
+                stateCode: document.getElementById('billingStateCode').value,
+                zipCode: document.getElementById('billingZipCode').value,
+            }
+        }
+        
+
+        let newPaymentMethod = await sendDataToServer(`/api/users/paymentMethods`, paymentMethodData)
+
+        location.reload()
+    }
+</script>

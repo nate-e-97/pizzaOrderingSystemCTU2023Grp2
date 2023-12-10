@@ -6,7 +6,7 @@
 }
 
 .contact{
-    min-height: 100vh;
+    min-height: 80vh;
     background-color: #e8f0fe;
     padding: 50px;
     text-align: center;
@@ -91,7 +91,7 @@ button:hover{
     margin-right: 10px;
 }
 
-@media screen and (max-width: 768px){
+/* @media screen and (max-width: 768px){
     .container{
         padding: 20px;
     }
@@ -99,4 +99,4 @@ button:hover{
         grid-template-columns: 1fr;
     }
 
-}
+} */

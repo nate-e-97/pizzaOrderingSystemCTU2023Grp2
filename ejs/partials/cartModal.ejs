@@ -1,0 +1,20 @@
+<div class="modal modal-dialog modal-dialog-scrollable fade" tabindex="-1" style="z-index: 2000;" id="cartModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cart</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="cartModalItemDisplay">
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" onclick="deleteCart()" data-bs-dismiss="modal">Delete Cart</button>
+                <button type="button" class="btn btn-primary" onclick="window.location.href='/checkout'">Checkout</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/cart_service.js"></script>
