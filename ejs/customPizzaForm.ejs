@@ -1,0 +1,83 @@
+<section>
+    <div class="row">
+        <div class="col">
+            <h5>Choose a Crust</h5>
+            <select class="form-select" aria-label="Crust Select" id="pizzaCrustSelect">
+                <option selected disabled>Select a crust...</option>
+
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h5>Choose a Sauce</h5>
+            <select class="form-select" aria-label="Sauce Select" id="pizzaSauceSelect">
+                <option selected disabled>Select a sauce...</option>
+
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h5>Choose Toppings</h5>
+            <select class="form-select" multiple aria-label="Select Toppings!" id="pizzaToppingsSelect">
+
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-primary" onclick="savePizza()">Save Changes</button>
+        </div>
+    </div>
+</section>
+
+<script>
+    window.addEventListener("load", async (event) => {
+		let pizzaData = await getDataFromServer(`/api/users/pizzas/${getCookie('editPizza')}`)
+        let ingredientsData = await getDataFromServer(`/api/pizzas/ingredients`)
+
+        ingredientsData.forEach( element => {
+            if (element.ingredientType == "CRUST") {
+                document.getElementById('pizzaCrustSelect').innerHTML += `
+                    <option value="${element.ingredientName}" ${pizzaData.crust && (pizzaData.crust.ingredientName == element.ingredientName) ? "selected" : ""}>${element.ingredientName}</option>
+                `
+            }
+            else if (element.ingredientType == "SAUCE") {
+                document.getElementById('pizzaSauceSelect').innerHTML += `
+                    <option value="${element.ingredientName}" ${pizzaData.sauce && (pizzaData.sauce.ingredientName == element.ingredientName) ? "selected" : ""}>${element.ingredientName}</option>
+                `
+            }
+            else {
+                document.getElementById('pizzaToppingsSelect').innerHTML += `
+                    <option value="${element.ingredientName}" ${pizzaData.toppings.filter(e => e.ingredientName == element.ingredientName).length > 0 ? "selected" : ""}>${element.ingredientName}</option>
+                `
+            }
+        });
+	});
+
+    function getSelectValues(select) {
+        let result = [];
+        let options = select && select.options;
+        let opt;
+
+        for (let i=0, iLen=options.length; i<iLen; i++) {
+            opt = options[i];
+
+            if (opt.selected) {
+            result.push(opt.value || opt.text);
+            }
+        }
+        return result;
+    }
+
+    async function savePizza() {
+        let pizzaCrust = document.getElementById('pizzaCrustSelect').value
+        let pizzaSauce = document.getElementById('pizzaSauceSelect').value
+        let toppings = getSelectValues(document.getElementById('pizzaToppingsSelect'))
+
+        await sendDataToServer(`/api/users/pizzas/${getCookie('editPizza')}`, {crust: pizzaCrust, sauce: pizzaSauce, toppings: toppings}, "PUT")
+
+        window.location.href = '/'
+    }
+</script>

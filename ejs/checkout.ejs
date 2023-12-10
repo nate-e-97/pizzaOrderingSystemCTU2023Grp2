@@ -1,0 +1,211 @@
+<section>
+    <h5>
+        Your Items
+    </h5>
+    <div id="checkoutCartDisplay">
+
+    </div>
+    <div class="row">
+        <div class="col">
+            <h5>Shipping (Primary) Address</h5>
+            <div id="checkoutExistingUserAddressOptionsContainer" style="display: none;">
+                <select onchange="updateActiveAddress(this.value)" class="form-select" id="accountAddressSelect" aria-label="Select your primary address">
+
+                </select>
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <button type="button" class="btn btn-primary" onclick="openAddressCreateForm()">Add Address</button>
+                    <button type="button" class="btn btn-primary" onclick="openAddressEditForm()">Edit Address</button>
+                </div>
+            </div>
+            <div id="checkoutAddressFormContainer" style="display: none;">
+                <%- include('./partials/addressForm.ejs') %>
+            </div>
+        </div>
+        <div class="col">
+            <h5>Payment Card</h5>
+            <div id="checkoutExistingUserPaymentMethodOptionsContainer" style="display: none;">
+                <select onchange="updateActivePaymentMethod(this.value)" class="form-select" id="accountPaymentMethodSelect" aria-label="Select your primary payment method">
+
+                </select>
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <button type="button" class="btn btn-primary" onclick="openPaymentMethodCreateForm()">Add Payment Method</button>
+                    <button type="button" class="btn btn-primary" onclick="openPaymentMethodEditForm()">Edit Payment Method</button>
+                </div>
+            </div>
+            <div id="checkoutPaymentMethodFormContainer" style="display: none;">
+                <%- include('./partials/paymentMethodForm.ejs') %>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <button class="btn btn-primary" onclick="CheckoutOrder()">Checkout</button>
+    </div>
+</section>
+
+<script>
+    let useAddressFormFlag = false
+    let usePaymentMethodFormFlag = false
+
+    async function CheckoutOrder() {
+        let paymentData
+        let addressData
+
+        if (useAddressFormFlag) {
+            let addressFormIdList = ['addressLine1', 'addressLine2', 'city', 'stateCode', 'zipCode']
+
+            let addressData = {}
+
+            addressFormIdList.forEach( addressField => {
+                addressData[addressField] = document.getElementById(addressField).value
+            })
+
+            let newAddress = await sendDataToServer(`/api/users/addresses`, addressData)
+
+            addressData = {
+                addressId: newAddress.addressId
+            }
+        }
+        else {
+            addressData = {
+                addressId: getCookie('activeAddress')
+            }
+        }
+
+        if (usePaymentMethodFormFlag) {
+            let paymentMethodFormFieldsList = ['cardNumber', 'cardExpDate', 'cardCvv', 'cardCardholderName']
+
+            let paymentMethodData = {}
+
+            paymentMethodFormFieldsList.forEach( paymentMethodField => {
+                paymentMethodData[paymentMethodField] = document.getElementById(paymentMethodField).value
+            })
+            
+            let usePrimaryBillingAddress = document.getElementById('billingAddressUsePrimary').checked
+
+            if (usePrimaryBillingAddress) {
+                paymentMethodData.billingAddress = {
+                    addressId: getCookie('activeAddress')
+                }
+            }
+            else {
+                paymentMethodData.billingAddress = {
+                    addressLine1: document.getElementById('billingAddressLine1').value,
+                    addressLine2: document.getElementById('billingAddressLine2').value,
+                    city: document.getElementById('billingCity').value,
+                    stateCode: document.getElementById('billingStateCode').value,
+                    zipCode: document.getElementById('billingZipCode').value,
+                }
+            }
+
+            let newCard = await sendDataToServer(`/api/users/paymentMethods`, paymentMethodData)
+
+            paymentData = {
+                cardId: newCard.cardId
+            }
+        }
+        else {
+            paymentData = {
+                cardId: getCookie('activePaymentMethod')
+            }
+        }
+        
+        await sendDataToServer('/api/users/orders', {
+            paymentMethod: paymentData,
+            shippingAddress: addressData
+        })
+
+        window.location.href = "/"
+    }
+
+    async function updateActiveAddress(addressId) {
+        sendDataToServer('/api/users/addresses', {addressId: addressId}, 'PUT')
+    }
+
+    async function updateActivePaymentMethod(paymentId) {
+        sendDataToServer('/api/users/paymentMethods', {cardId: paymentId}, 'PUT')
+    }
+
+    function openAddressCreateForm() {
+        let formContainer = document.getElementById('checkoutAddressFormContainer')
+        addressFormMode = addressFormModes.create
+        resetAddressForm()
+
+        useAddressFormFlag = true
+
+        formContainer.style.display = 'block'
+    }
+
+    async function openAddressEditForm() {
+        let formContainer = document.getElementById('checkoutAddressFormContainer')
+        addressFormAddressId = document.getElementById('accountAddressSelect').value
+        addressFormMode = addressFormModes.edit
+
+        await populateAddressForm()
+
+        useAddressFormFlag = true
+
+        formContainer.style.display = 'block'
+    }
+
+    function openPaymentMethodCreateForm() {
+        let formContainer = document.getElementById('checkoutPaymentMethodFormContainer')
+        paymentMethodFormMode = paymentMethodFormModes.create
+        resetPaymentMethodForm()
+
+        usePaymentMethodFormFlag = true
+
+        formContainer.style.display = 'block'
+    }
+
+    async function openPaymentMethodEditForm() {
+        let formContainer = document.getElementById('checkoutPaymentMethodFormContainer')
+        paymentMethodFormId = document.getElementById('accountPaymentMethodSelect').value
+        paymentMethodFormMode = paymentMethodFormModes.edit
+
+        await populatePaymentMethodForm()
+
+        usePaymentMethodFormFlag = true
+
+        formContainer.style.display = 'block'
+    }
+
+    window.addEventListener("load", async (event) => {
+        await populateCart()
+        await renderCartCheckout()
+
+        if (getCookie('activeUser')) {
+            document.getElementById('checkoutExistingUserAddressOptionsContainer').style.display = 'block'
+            document.getElementById('checkoutExistingUserPaymentMethodOptionsContainer').style.display = 'block'
+
+            let userData = await getDataFromServer(`/api/users/${getCookie('activeUser')}`)
+            document.getElementById('accountAddressSelect').innerHTML = '<option value="" disabled selected>Select your option</option>'
+
+            userData.addresses.forEach( address => {
+                document.getElementById('accountAddressSelect').innerHTML += `
+                    <option ${getCookie('activeAddress') == address.addressId ? 'selected' : ''} value='${address.addressId}'>${address.addressLine1}${address.addressLine2 ? ", "+address.addressLine2 : ""}, ${address.city} ${address.stateCode}</option>
+                `
+            })
+
+            document.getElementById('accountPaymentMethodSelect').innerHTML = '<option value="" disabled selected>Select your option</option>'
+
+            userData.cards.forEach( card => {
+                document.getElementById('accountPaymentMethodSelect').innerHTML += `
+                    <option ${getCookie('activePaymentMethod') == card.cardId ? 'selected' : ''} value="${card.cardId}">*${card.cardNumber.slice(card.cardNumber.length-4)}</option>
+                `
+            })
+
+            document.getElementById('addressFormSubmit').style.display = 'none'
+            document.getElementById('paymentMethodCardSubmit').style.display = 'none'
+        }
+        else {
+            useAddressFormFlag = true
+            usePaymentMethodFormFlag = true
+
+            document.getElementById('checkoutAddressFormContainer').style.display = 'block'
+            document.getElementById('addressFormSubmit').style.display = 'none'
+            
+            document.getElementById('checkoutPaymentMethodFormContainer').style.display = 'block'
+            document.getElementById('paymentMethodCardSubmit').style.display = 'none'
+        }
+    })
+</script>

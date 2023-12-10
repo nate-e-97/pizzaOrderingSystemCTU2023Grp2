@@ -1,0 +1,79 @@
+<div class="row">
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Address Line 1" aria-label="Address Line 1" id="addressLine1">
+        <input type="text" class="form-control" placeholder="Address Line 2" aria-label="Address Line 2" id="addressLine2">
+    </div>
+</div>
+<div class="row">
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="City" aria-label="City" id="city">
+        <input type="text" class="form-control" placeholder="State Code (i.e. CO, CA)" aria-label="State" id="stateCode">
+        <input type="text" class="form-control" placeholder="zip code" aria-label="Zip Code" id="zipCode">
+    </div>
+</div>
+<div class="row">
+    <button class="btn btn-primary" id="addressFormSubmit">Submit</button>
+</div>
+
+<script>
+    let addressFormAddressId = null
+
+    let addressFormModes = {
+        edit: 1,
+        create: 0
+    }
+
+    let addressFormMode = addressFormModes.create
+
+    document.getElementById('addressFormSubmit').addEventListener('click', async e => {
+        e.preventDefault()
+
+        if (addressFormMode === 0) {
+            await createAddress()
+        }
+        else if (addressFormMode === 1) {
+            await updateAddress(addressFormAddressId)
+        }
+    })
+
+    const addressFormIdList = ['addressLine1', 'addressLine2', 'city', 'stateCode', 'zipCode']
+
+    function resetAddressForm() {
+        addressFormIdList.forEach(elementId => {
+            document.getElementById(elementId).value = ''
+        })
+    }
+
+    async function populateAddressForm() {
+        let addressData = await getDataFromServer(`/api/users/addresses/${addressFormAddressId}`)
+        addressFormIdList.forEach( addressField => {
+            document.getElementById(addressField).value = addressData[addressField]
+        })
+    }
+
+    async function updateAddress(addressId) {
+        let addressUpdateData = {}
+
+        addressFormIdList.forEach( addressField => {
+            addressUpdateData[addressField] = document.getElementById(addressField).value
+        })
+        console.log(`/api/users/addresses/${addressId}`)
+
+        let update = await sendDataToServer(`/api/users/addresses/${addressId}`, addressUpdateData, 'PUT')
+
+        location.reload()
+    }
+
+    async function createAddress() {
+        let addressData = {}
+
+        addressFormIdList.forEach( addressField => {
+            addressData[addressField] = document.getElementById(addressField).value
+        })
+
+        let newAddress = await sendDataToServer(`/api/users/addresses`, addressData)
+
+        location.reload()
+    }
+
+</script>

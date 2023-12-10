@@ -1,0 +1,124 @@
+<section>
+    <div class="row">
+        <h5 id="accountHeader"></h5>
+    </div>
+    <div class="row">
+        <div class="col">
+            Contact: <span id="accountPhoneNumber"></span>
+            <p>Past Order Numbers:</p>
+            <ul id="ordersList"></ul>
+        </div>
+        <div class="col">
+            <div class="input-group mb-3">
+                <button class="btn btn-outline-secondary" type="button">Primary Address</button>
+                <select onchange="updateActiveAddress(this.value)" class="form-select" id="accountAddressSelect" aria-label="Select your primary address">
+
+                </select>
+            </div>
+            <div id="accountAddressContainer" style="display: none;">
+                <%- include('./partials/addressForm.ejs') %>
+            </div>
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-primary" onclick="openAddressCreateForm()">Add Address</button>
+                <button type="button" class="btn btn-primary" onclick="openAddressEditForm()">Edit Address</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-warning" type="button" id="logoutBtn" onclick="logout()">Logout</button>
+        </div>
+        <div class="col">
+            <div class="input-group mb-3">
+                <button class="btn btn-outline-secondary" type="button">Primary Payment Method</button>
+                <select onchange="updateActivePaymentMethod(this.value)" class="form-select" id="accountPaymentMethodSelect" aria-label="Select your primary payment method">
+
+                </select>
+            </div>
+            <div id="accountPaymentMethodContainer" style="display: none;">
+                <%- include('./partials/paymentMethodForm.ejs') %>
+            </div>
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-primary" onclick="openPaymentMethodCreateForm()">Add Payment Method</button>
+                <button type="button" class="btn btn-primary" onclick="openPaymentMethodEditForm()">Edit Payment Method</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    window.addEventListener("load", async (event) => {
+		let userData = await getDataFromServer(`/api/users/${getCookie('activeUser')}`)
+
+        document.getElementById('accountHeader').innerHTML = `Welcome, ${userData.firstName} ${userData.lastName}`
+        document.getElementById('accountPhoneNumber').innerHTML = `${userData.phoneNumber}`
+
+        document.getElementById('accountAddressSelect').innerHTML = '<option value="" disabled selected>Select your option</option>'
+
+        userData.addresses.forEach( address => {
+            document.getElementById('accountAddressSelect').innerHTML += `
+                <option ${getCookie('activeAddress') == address.addressId ? 'selected' : ''} value='${address.addressId}'>${address.addressLine1}${address.addressLine2 ? ", "+address.addressLine2 : ""}, ${address.city} ${address.stateCode}</option>
+            `
+        })
+
+        document.getElementById('accountPaymentMethodSelect').innerHTML = '<option value="" disabled selected>Select your option</option>'
+
+        userData.cards.forEach( card => {
+            document.getElementById('accountPaymentMethodSelect').innerHTML += `
+                <option ${getCookie('activePaymentMethod') == card.cardId ? 'selected' : ''} value="${card.cardId}">*${card.cardNumber.slice(card.cardNumber.length-4)}</option>
+            `
+        })
+
+        document.getElementById('ordersList').innerHTML = ''
+        userData.orders.forEach( order => {
+            document.getElementById('ordersList').innerHTML += `
+                <li>${order.orderId}</li>
+            `
+        })
+	});
+
+    async function updateActiveAddress(addressId) {
+        sendDataToServer('/api/users/addresses', {addressId: addressId}, 'PUT')
+    }
+
+    async function updateActivePaymentMethod(paymentId) {
+        sendDataToServer('/api/users/paymentMethods', {cardId: paymentId}, 'PUT')
+    }
+
+    function openAddressCreateForm() {
+        let formContainer = document.getElementById('accountAddressContainer')
+        addressFormMode = addressFormModes.create
+        resetAddressForm()
+
+        formContainer.style.display = 'block'
+    }
+
+    async function openAddressEditForm() {
+        let formContainer = document.getElementById('accountAddressContainer')
+        addressFormAddressId = document.getElementById('accountAddressSelect').value
+        addressFormMode = addressFormModes.edit
+
+        await populateAddressForm()
+
+        formContainer.style.display = 'block'
+    }
+
+    function openPaymentMethodCreateForm() {
+        let formContainer = document.getElementById('accountPaymentMethodContainer')
+        paymentMethodFormMode = paymentMethodFormModes.create
+        resetPaymentMethodForm()
+
+        formContainer.style.display = 'block'
+    }
+
+    async function openPaymentMethodEditForm() {
+        let formContainer = document.getElementById('accountPaymentMethodContainer')
+        paymentMethodFormId = document.getElementById('accountPaymentMethodSelect').value
+        paymentMethodFormMode = paymentMethodFormModes.edit
+
+        await populatePaymentMethodForm()
+
+        formContainer.style.display = 'block'
+    }
+
+</script>

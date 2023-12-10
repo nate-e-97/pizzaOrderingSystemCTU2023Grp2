@@ -1,0 +1,111 @@
+<!-- home section -->
+<section class="home" id="home">
+    <div class="home-text">
+        <h1><span>Welcome</span> to The world of Tasty & Fresh Pizza</h1>
+        <p>Group2 Pizza has the best pizza you've ever heard about.</p>
+        <a href="#pizzaMenuContainer" class="btn">Choose a Pizza</a>
+    </div>
+</section>
+
+<!-- contact section -->
+<section class="container">
+    <div class="main-text">
+        <h2>Ingredients</h2>
+        <p>Only the Best for You</p>
+    </div>
+
+    <div class="container-box" id="ingredientsMenuContainer">
+        <div class="c-mainbox">
+            <div class="container-text">
+                <p>Delicate Dough</p>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<!-- about section -->
+<section class="about" id="about">
+    <div class="about-text">
+        <h2>The Delicious Food<br> For a Good Mood</h2>
+        <p>We've been in business since 2023 and we've heard nothing but good things. Based in the United States, home of both New York and Chicago Style Pizzas, we know pizza. What're you waiting for?</p>
+        <a href="#pizzaMenuContainer" class="btn">Choose a Pizza</a>
+    </div>
+</section>
+
+<!-- menu section -->
+
+<section class="menu" id="menu">
+    <div class="main-text">
+        <h2>Most Popular Pizza</h2>
+        <p>We have selected for You the most exquisite tastes around the world</p>
+        <h5><a href="/promos">Current Promos</a></h5>
+    </div>
+
+    <div class="menu-content" id="pizzaMenuContainer"></div>
+
+</section>
+
+<script>
+    window.addEventListener("load", async (event) => {
+		let ingredients = await getDataFromServer('/api/pizzas/ingredients')
+        document.getElementById('ingredientsMenuContainer').innerHTML = ""
+        ingredients.forEach(ingredient => {
+            document.getElementById('ingredientsMenuContainer').innerHTML += `
+            <div class="c-mainbox">
+                <div class="container-text">
+                    <p>${ingredient.ingredientName}</p>
+                </div>
+            </div>
+            `
+        })
+
+        let pizzas = await getDataFromServer('/api/pizzas')
+        document.getElementById('pizzaMenuContainer').innerHTML = ''
+
+        pizzas.forEach(pizza => {
+            document.getElementById('pizzaMenuContainer').innerHTML += `
+            <div class="row">
+                <div class="menu-text">
+                    <div class="menu-left">
+                        <h4>${pizza.name}</h4>
+                    </div>
+                    <div class="menu-right">
+                        <h5>${renderIntAsMoneyString(pizza.price)}</h5>
+                    </div>
+                </div>
+                <p>With ${pizza.ingredients.slice(0, pizza.ingredients.length-1).join(', ')} and ${pizza.ingredients[pizza.ingredients.length-1]}.</p>
+                <button class="btn btn-secondary" onclick="addItemToCart({itemType: 'MenuPizzas', itemReference: '${pizza.name}', count: 1, size: 'REG'})">Add to Cart</button>
+                <div class="star">
+                    <i class='bx bxs-star' ></i>
+                    <i class='bx bxs-star' ></i>
+                    <i class='bx bxs-star' ></i>
+                    <i class='bx bxs-star' ></i>
+                    <i class='bx bxs-star' ></i>
+                </div>
+            </div>
+            `
+        })
+
+        document.getElementById('pizzaMenuContainer').innerHTML += `
+            <div class="row">
+                <div class="menu-text">
+                    <div class="menu-left">
+                        <h4>Custom Pizza</h4>
+                    </div>
+                </div>
+                <p>Design your own pizza!</p>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Select Size
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><button onclick="addItemToCart({itemType: 'CustomPizzas', itemReference: 0, count: 1, size: 'SM'})" class="dropdown-item" href="#">Small - $8.99</button></li>
+                        <li><button onclick="addItemToCart({itemType: 'CustomPizzas', itemReference: 0, count: 1, size: 'MED'})" class="dropdown-item" href="#">Medium - $10.99</button></li>
+                        <li><button onclick="addItemToCart({itemType: 'CustomPizzas', itemReference: 0, count: 1, size: 'LG'})" class="dropdown-item" href="#">Large - $12.99</button></li>
+                    </ul>
+                </div>
+            </div>
+        `
+	});
+</script>
